@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book a Ride | Yugan Yuganika Cabs & Travels</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Leaflet CSS for Map -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+</head>
+<body class="page-bg">
+
+    <!-- Header Section -->
+    <header class="navbar scrolled">
+        <div class="container nav-container">
+            <div class="logo">
+                <a href="index.html">
+                    <span class="logo-text">YUGAN YUGANIKA</span>
+                    <span class="logo-subtext">CABS & TRAVELS</span>
+                </a>
+            </div>
+            
+            <nav class="nav-links">
+                <a href="index.html">Home</a>
+                <a href="index.html#services">Services</a>
+                <a href="index.html#contact">Contact</a>
+                <a href="admin.html" class="admin-link"><i class="fa-solid fa-lock"></i></a>
+            </nav>
+
+            <div class="mobile-menu-icon" id="menu-btn">
+                <i class="fas fa-bars"></i>
+            </div>
+        </div>
+    </header>
+
+    <main class="container booking-container">
+        <div class="booking-header reveal active">
+            <h1>Book Your Journey</h1>
+            <p>Fill out the details below to get an instant estimate and book your ride.</p>
+        </div>
+
+        <div class="booking-grid">
+            <div class="booking-form-card reveal-left active">
+                <form id="bookingForm">
+                    <div class="form-group">
+                        <label for="name">Full Name</label>
+                        <input type="text" id="name" required placeholder="Enter your full name">
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="phone">Phone Number</label>
+                            <input type="tel" id="phone" required placeholder="e.g. +91 90872 30421">
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email Address</label>
+                            <input type="email" id="email" required placeholder="e.g. name@example.com">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="carType">Car Type</label>
+                            <select id="carType" required>
+                                <option value="4+1">4+1 Seater (Sedan/Compact)</option>
+                                <option value="7+1">7+1 Seater (SUV)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="tripType">Trip Type</label>
+                            <select id="tripType" required>
+                                <option value="oneway">One Way</option>
+                                <option value="roundtrip">Round Trip</option>
+                                <option value="package">Package Plan (Per Hr)</option>
+                                <option value="dayrent">Day Rent (12 Hrs)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row" id="locationFields">
+                        <div class="form-group">
+                            <label for="pickup">Pickup Place</label>
+                            <input type="text" id="pickup" placeholder="e.g. Madurai, Tamil Nadu">
+                        </div>
+                        <div class="form-group">
+                            <label for="drop">Drop Place</label>
+                            <input type="text" id="drop" placeholder="e.g. Chennai, Tamil Nadu">
+                        </div>
+                    </div>
+
+                    <!-- Dynamic Fields based on Trip Type -->
+                    <div class="dynamic-fields" id="dynamicFields">
+                        <div class="form-group" id="distanceGroup">
+                            <label id="distanceLabel" for="distance">Calculated Distance (km)</label>
+                            <input type="number" id="distance" min="0" step="0.1" readonly placeholder="Auto-calculated">
+                        </div>
+                        
+                        <div class="form-group" id="hoursGroup" style="display: none;">
+                            <label for="hours">Calculated/Estimated Hours</label>
+                            <input type="number" id="hours" min="0" step="0.1" value="4">
+                        </div>
+                        
+                        <div class="form-group" id="daysGroup" style="display: none;">
+                            <label for="days">Number of Days</label>
+                            <input type="number" id="days" min="1" value="1">
+                        </div>
+                    </div>
+
+                    <button type="button" id="calculateBtn" class="btn-primary full-width">
+                        <span id="calcText">Calculate Distance & Price</span>
+                        <i id="calcSpinner" class="fa-solid fa-spinner fa-spin" style="display: none;"></i>
+                    </button>
+                    
+                    <div id="mapContainer" class="map-container" style="display: none;">
+                        <label>Route Map</label>
+                        <div id="routeMap" style="height: 300px; width: 100%; border-radius: 10px; margin-top: 10px; z-index: 1;"></div>
+                    </div>
+                </form>
+            </div>
+
+            <div class="booking-summary-card reveal-right active">
+                <div class="summary-box">
+                    <h3>Trip Summary</h3>
+                    <div id="summaryDetails" class="summary-details">
+                        <p class="placeholder-text">Fill the form and click Calculate to see the price estimate.</p>
+                    </div>
+                    
+                    <div class="total-price-box">
+                        <span class="price-label">Estimated Total:</span>
+                        <span class="price-amount" id="totalPrice">₹ 0</span>
+                    </div>
+
+                    <button type="button" id="submitBookingBtn" class="btn-primary full-width success-btn" disabled>Confirm Booking</button>
+                    <p id="successMessage" class="success-msg" style="display: none;"><i class="fa-solid fa-circle-check"></i> Booking Confirmed! We will contact you soon.</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer Section -->
+    <footer>
+        <div class="container footer-bottom">
+            <p>&copy; 2026 Yugan Yuganika Cabs & Travels. All Rights Reserved. | Made by <a href="https://hmi-proj.vercel.app/" target="_blank" rel="noopener noreferrer" style="color: var(--accent); font-weight: 600; text-decoration: none;">HMI Digital</a></p>
+        </div>
+    </footer>
+
+    <!-- Leaflet JS for Map -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script src="script.js"></script>
+    <script src="booking.js"></script>
+</body>
+</html>

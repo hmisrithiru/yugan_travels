@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | Yugan Yuganika Cabs</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="page-bg">
+
+    <header class="navbar scrolled">
+        <div class="container nav-container">
+            <div class="logo">
+                <a href="index.html">
+                    <span class="logo-text">YUGAN YUGANIKA</span>
+                    <span class="logo-subtext">ADMIN DASHBOARD</span>
+                </a>
+            </div>
+            <nav class="nav-links">
+                <a href="index.html">Back to Website</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container admin-container">
+        <div class="admin-header reveal active">
+            <h1>Recent Bookings</h1>
+            <p>View all booking requests submitted by customers.</p>
+            <button class="btn-secondary" id="clearBtn"><i class="fa-solid fa-trash"></i> Clear All Bookings</button>
+        </div>
+
+        <div class="admin-table-container reveal active">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>Date & Time</th>
+                        <th>Customer Details</th>
+                        <th>Trip & Car</th>
+                        <th>Price Details</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="bookingTableBody">
+                    <!-- Dynamic Rows -->
+                </tbody>
+            </table>
+            <div id="noDataMessage" class="no-data-msg" style="display: none;">
+                No bookings found yet.
+            </div>
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const tableBody = document.getElementById('bookingTableBody');
+            const noDataMsg = document.getElementById('noDataMessage');
+            const clearBtn = document.getElementById('clearBtn');
+
+            function loadBookings() {
+                const bookings = JSON.parse(localStorage.getItem('yuganBookings')) || [];
+                tableBody.innerHTML = '';
+
+                if (bookings.length === 0) {
+                    noDataMsg.style.display = 'block';
+                    document.querySelector('.admin-table').style.display = 'none';
+                    return;
+                }
+
+                noDataMsg.style.display = 'none';
+                document.querySelector('.admin-table').style.display = 'table';
+
+                bookings.reverse().forEach((booking, index) => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${booking.date}</td>
+                        <td>
+                            <strong>${booking.name}</strong><br>
+                            <a href="tel:${booking.phone}"><i class="fa-solid fa-phone"></i> ${booking.phone}</a><br>
+                            <a href="mailto:${booking.email}"><i class="fa-solid fa-envelope"></i> ${booking.email}</a>
+                        </td>
+                        <td>
+                            <span class="badge">${booking.trip.toUpperCase()}</span><br>
+                            <span class="badge-car">${booking.car} Seater</span>
+                            ${(booking.pickup || booking.drop) ? `
+                            <div style="margin-top: 10px; font-size: 13px; color: #555;">
+                                <strong><i class="fa-solid fa-location-dot" style="color: #EF4444;"></i> From:</strong> ${booking.pickup || 'N/A'}<br>
+                                <strong><i class="fa-solid fa-location-crosshairs" style="color: #10B981;"></i> To:</strong> ${booking.drop || 'N/A'}
+                            </div>` : ''}
+                        </td>
+                        <td>
+                            <span class="admin-price">₹ ${booking.price.toLocaleString('en-IN')}</span>
+                            <div class="admin-details">${booking.details}</div>
+                        </td>
+                        <td>
+                            <button class="btn-delete" data-id="${booking.id}"><i class="fa-solid fa-trash"></i></button>
+                        </td>
+                    `;
+                    tableBody.appendChild(tr);
+                });
+
+                // Add delete listeners
+                document.querySelectorAll('.btn-delete').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const id = e.currentTarget.getAttribute('data-id');
+                        let currentBookings = JSON.parse(localStorage.getItem('yuganBookings')) || [];
+                        currentBookings = currentBookings.filter(b => b.id !== id);
+                        localStorage.setItem('yuganBookings', JSON.stringify(currentBookings));
+                        loadBookings();
+                    });
+                });
+            }
+
+            clearBtn.addEventListener('click', () => {
+                if(confirm("Are you sure you want to delete ALL bookings?")) {
+                    localStorage.removeItem('yuganBookings');
+                    loadBookings();
+                }
+            });
+
+            loadBookings();
+        });
+    </script>
+</body>
+</html>
